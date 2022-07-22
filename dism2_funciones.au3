@@ -123,10 +123,9 @@ EndFunc
 ;~ Status : Ok
 
 ;~ The operation completed successfully.
-;~ Dism /Unmount-Image /MountDir:C:\test\offline /commit
-
 
 Func getListMounted($ctrlListView)
+	GUICtrlSendMsg($ctrlListView, $LVM_DELETEALLITEMS, 0, 0)	; Delete all Items
 	Local $txtCommandLine = "Dism /Get-MountedImageInfo"
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 
@@ -166,6 +165,82 @@ Func getListMounted($ctrlListView)
 ;~ 		ActualizandoStatus("Ocurrio un error al examinar el archivo WIM")
 	EndIf
 EndFunc
+
+Func DismUnmount($RutaMontaje, $bolGuardarCambios, $Salida)
+	;~ 	Dism /Unmount-Image /MountDir:C:\test\offline /commit
+	Local $strSave
+	If $bolGuardarCambios = $GUI_CHECKED Then
+		$strSave = "/commit"
+		OptimizeImage($RutaMontaje, $Salida)
+	Else
+		$strSave = "/discard"
+	EndIf
+
+	Local $txtCommandLine = 'dism /Unmount-Image /MountDir:"' & $RutaMontaje & _
+								'" ' & $strSave
+
+	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	While ProcessExists($psTarea)
+		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+		GUICtrlSetData($Salida, $mensajes)
+	WEnd
+
+EndFunc
+
+Func OptimizeImage($RutaMontaje, $Salida)
+	;~ 		optimizamos winre
+	;~ dism /image:"W:\WinPE_amd64\mount_winre" /Cleanup-Image /StartComponentCleanup /scratchdir:c:\scratchdir
+	Local $txtCommandLine = 'dism /image:"' & $RutaMontaje & _
+								'" /Cleanup-Image /StartComponentCleanup '
+
+	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	While ProcessExists($psTarea)
+		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+		GUICtrlSetData($Salida, $mensajes)
+	WEnd
+EndFunc
+
+Func DismAddDriver($RutaDriver, $strRutaMontajeSel, $Salida)
+;~ 	Dism /Add-Driver /Image:"W:\WinPE_amd64\mount" /Driver:"W:\WinPE_amd64\VMD\iastorVD.inf" /scratchdir:c:\scratchdir
+	Local $txtCommandLine = 'Dism /Add-Driver /Image:"' & $strRutaMontajeSel & _
+								'" /Driver:"' & $RutaDriver & '"'
+
+	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	While ProcessExists($psTarea)
+		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+		GUICtrlSetData($Salida, $mensajes)
+	WEnd
+EndFunc
+
+Func VerifyDrivers($RutaMontaje, $Salida)
+	;~ Verify that the drivers are part of the image:
+	;~ Dism /Get-Drivers /Image:"W:\WinPE_amd64\mount"
+	Local $txtCommandLine = 'Dism /Get-Drivers /Image:"' & $RutaMontaje & '"'
+	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	While ProcessExists($psTarea)
+		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+		GUICtrlSetData($Salida, $mensajes)
+	WEnd
+EndFunc
+
+;~ DismExport(GUICtrlRead($InExpFileSrc), GUICtrlRead($inExpFileDst), GUICtrlRead($inExpImIndex), GUICtrlRead($cmbExpCompx), $editForm)
+Func DismExport($RutaFileSrc, $RutaFileDst,  $ImageIndex, $compresion, $Salida)
+;~ 	Dism /Export-Image /SourceImageFile:<path_to_image_file>
+;~ 	{/SourceIndex:<image_index> | /SourceName:<image_name>}
+;~ 	/DestinationImageFile:<path_to_image_file>
+;~ 	[/DestinationName:<Name>] [/Compress:{fast|max|none|recovery}] [/Bootable] [/WIMBoot] [/CheckIntegrity]
+
+	Local $txtCommandLine = 'Dism /Export-Image /SourceImageFile:"' & $RutaFileSrc & _
+							'" /SourceIndex:' & $ImageIndex & _
+							' /DestinationImageFile:"' & $RutaFileDst & _
+							'" /Compress:' & $compresion
+	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	While ProcessExists($psTarea)
+		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+		GUICtrlSetData($Salida, $mensajes)
+	WEnd
+EndFunc
+
 
 Func CargaListaImagenes($sRutaFileWim)
 	If $sRutaFileWim = "" Then Return False

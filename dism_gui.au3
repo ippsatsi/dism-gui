@@ -1,5 +1,13 @@
 #RequireAdmin
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile_x64=dism_gui.exe
+#AutoIt3Wrapper_Res_Fileversion=1.0
+#AutoIt3Wrapper_Res_ProductName=dism_gui
+#AutoIt3Wrapper_Res_ProductVersion=1.0
 #AutoIt3Wrapper_Res_HiDpi=Y
+#AutoIt3Wrapper_Run_AU3Check=n
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
+
 
 #include <ButtonConstants.au3>
 #include <ComboConstants.au3>
@@ -94,10 +102,10 @@ Func Eventos_gui($ev)
 					GUICtrlRead($cmbCapComprx), $editForm, True)
 			EndIf
 		Case $btnaplAplicarIma
-			If $inAplFileSrc <> "" And _
-				$inAplUnidadDst <> "" And _
-				$inAplIndexImage <> "" And _
-				$inAplIageName <> "" Then
+			If GUICtrlRead($inAplFileSrc) <> "" And _
+				GUICtrlRead($inAplUnidadDst) <> "" And _
+				GUICtrlRead($inAplIndexImage) <> "" And _
+				GUICtrlRead($inAplIageName) <> "" Then
 				DismApply(GUICtrlRead($inAplFileSrc), _
 					GUICtrlRead($inAplUnidadDst), _
 					GUICtrlRead($inAplIndexImage), _
@@ -111,29 +119,65 @@ Func Eventos_gui($ev)
 					GUICtrlRead($inMntFileSrc), _
 					GUICtrlRead($inMntIndexIma), _
 					$editForm)
+				ControlListView($gui_dism, "", $lvMnt1,"SelectClear")
 			EndIf
 		Case $btnMntUnmount
 			Local $ItemSelected
 			If ControlListView($gui_dism, "", $lvMnt1, "GetItemCount") > 0 Then
-				$ItemSelected = ControlListView($gui_dism, "", $lvMnt1,"GetSelected", 1)
-				MsgBox($MB_SYSTEMMODAL,"Desmontar1", $ItemSelected & ' error:' & @error )
-				If $ItemSelected <> "" Then
-					Dim $arImagenMontada[5]
-					$arImagenMontada = StringSplit($ItemSelected,"|",  $STR_NOCOUNT )
-					_ArrayDisplay($arImagenMontada, "2D display")
+				$intItemSelected = ControlListView($gui_dism, "", $lvMnt1,"GetSelected")
+				$strRutaMontajeSel = ControlListView($gui_dism, "", $lvMnt1,"GetText", $ItemSelected, 1)
+;~ 				MsgBox($MB_SYSTEMMODAL,"Desmontar1", $strItemSelected & ' error:' & @error )
+				If $strRutaMontajeSel <> "" Then
+					DismUnmount($strRutaMontajeSel, GUICtrlRead($ckbMntCommit), $editForm)
+					getListMounted($lvMnt1)
 				Else
 					MsgBox($MB_SYSTEMMODAL,"Desmontar", "No ha seleccionado mninguna imagen montada")
 				EndIf
-
-
 			EndIf
 
+		Case $btnMntUpdateList
+			getListMounted($lvMnt1)
+			ControlListView($gui_dism, "", $lvMnt1,"SelectClear")
+		Case $btnMntAddDrivers
+			Local $ItemSelected
+			If ControlListView($gui_dism, "", $lvMnt1, "GetItemCount") > 0 Then
+				$intItemSelected = ControlListView($gui_dism, "", $lvMnt1,"GetSelected")
+				$strRutaMontajeSel = ControlListView($gui_dism, "", $lvMnt1,"GetText", $ItemSelected, 1)
+;~ 				MsgBox($MB_SYSTEMMODAL,"Desmontar1", $strItemSelected & ' error:' & @error )
+				If $strRutaMontajeSel <> "" Then
+					Local $RutaDriver = SelectFileDialog("driver", $inCapFileDst,"Seleccione el .inf del driver a instalar", "inf")
+					If $RutaDriver <> "" Then
+						DismAddDriver($RutaDriver, $strRutaMontajeSel, $editForm)
+						VerifyDrivers($strRutaMontajeSel, $editForm)
+					EndIf
+				Else
+					MsgBox($MB_SYSTEMMODAL,"Desmontar", "No ha seleccionado mninguna imagen montada")
+				EndIf
+			EndIf
 
+		Case $btnMntExplorar
+			Local $ItemSelected
+			If ControlListView($gui_dism, "", $lvMnt1, "GetItemCount") > 0 Then
+				$intItemSelected = ControlListView($gui_dism, "", $lvMnt1,"GetSelected")
+				$strRutaMontajeSel = ControlListView($gui_dism, "", $lvMnt1,"GetText", $ItemSelected, 1)
+;~ 				MsgBox($MB_SYSTEMMODAL,"Desmontar1", $strItemSelected & ' error:' & @error )
+				If $strRutaMontajeSel <> "" Then
+					Local $psTarea = Run("explorer.exe " & $strRutaMontajeSel, "", @SW_MAXIMIZE )
+				Else
+					MsgBox($MB_SYSTEMMODAL,"Desmontar", "No ha seleccionado mninguna imagen montada")
+				EndIf
+			EndIf
+
+		Case $btnExpExp
+			If GUICtrlRead($InExpFileSrc) <> "" And _
+				GUICtrlRead($inExpFileDst) <> "" Then
+				DismExport(GUICtrlRead($InExpFileSrc), GUICtrlRead($inExpFileDst), GUICtrlRead($inExpImIndex), GUICtrlRead($cmbExpCompx), $editForm)
+			EndIf
 
 		Case $btnAplSelIma
 			$indexCtrlSelectImage = 0
 			ActualizarListaImagenes($indexCtrlSelectImage)
-ShowFormListImagenes()
+			ShowFormListImagenes()
 		Case $btnMntSelIma
 			$indexCtrlSelectImage = 1
 			ActualizarListaImagenes($indexCtrlSelectImage)

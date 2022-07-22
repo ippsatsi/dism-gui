@@ -1,5 +1,5 @@
 #Region ### START Koda GUI section ### Form=c:\users\w10\documents\git\dism gui\dism_gui_form.kxf
-$gui_dism = GUICreate("Dism GUI", 615, 578, 192, 124)
+$gui_dism = GUICreate("Dism GUI v1.0", 615, 578, 192, 124)
 $Tab1 = GUICtrlCreateTab(23, 8, 569, 377)
 
 $Capturar = GUICtrlCreateTabItem("Capturar")
@@ -77,9 +77,10 @@ $inExpImaName = GUICtrlCreateInput("", 177, 104, 281, 21, BitOR($GUI_SS_DEFAULT_
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $grpExp2 = GUICtrlCreateGroup("Destino", 39, 168, 537, 105)
 $lblExp3 = GUICtrlCreateLabel("Archivo WIM", 55, 200, 66, 17)
-$inExpFileDst = GUICtrlCreateInput("", 135, 200, 321, 21)
+$inExpFileDst = GUICtrlCreateInput("", 135, 200, 321, 21, BitOR($GUI_SS_DEFAULT_INPUT,$ES_READONLY))
 $btnExpDst = GUICtrlCreateButton("Examinar", 483, 199, 75, 25)
 $cmbExpCompx = GUICtrlCreateCombo("", 134, 235, 129, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
+GUICtrlSetData($cmbExpCompx, "Max|Fast", "Fast")
 $lblExp4 = GUICtrlCreateLabel("Compresion", 55, 238, 59, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $btnExpExp = GUICtrlCreateButton("Exportar", 484, 321, 75, 25)
