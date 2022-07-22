@@ -36,7 +36,7 @@
 				<property name="Top" vt="Int8">8</property>
 				<property name="Width" vt="Int16">569</property>
 				<property name="Height" vt="Int16">377</property>
-				<property name="ActivePage" vt="Ident">Capturar</property>
+				<property name="ActivePage" vt="Ident">TabSheet3</property>
 				<property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
 				<property name="Font.Color" vt="Ident">clWindowText</property>
 				<property name="Font.Height" vt="Int8">-11</property>
@@ -407,7 +407,7 @@
 								<property name="Width" vt="Int8">41</property>
 								<property name="Height" vt="Int8">21</property>
 								<property name="TabOrder" vt="Int8">7</property>
-								<property name="CtrlStyle" vt="Int32">1342374016</property>
+								<property name="CtrlStyle" vt="Int32">1342384256</property>
 								<property name="CtrlExStyle" vt="Int16">512</property>
 								<property name="Resizing" vt="Set">DockHeight</property>
 							</properties>
@@ -435,7 +435,7 @@
 								<property name="Width" vt="Int16">289</property>
 								<property name="Height" vt="Int8">21</property>
 								<property name="TabOrder" vt="Int8">9</property>
-								<property name="CtrlStyle" vt="Int32">1342374016</property>
+								<property name="CtrlStyle" vt="Int32">1342384256</property>
 								<property name="CtrlExStyle" vt="Int16">512</property>
 								<property name="Resizing" vt="Set">DockHeight</property>
 							</properties>
@@ -656,9 +656,9 @@
 							<components>
 								<object type="TAListView" name="lvMnt1">
 									<properties>
-										<property name="Left" vt="Int8">16</property>
+										<property name="Left" vt="Int8">8</property>
 										<property name="Top" vt="Int8">21</property>
-										<property name="Width" vt="Int16">506</property>
+										<property name="Width" vt="Int16">522</property>
 										<property name="Height" vt="Int8">70</property>
 										<property name="CtrlStyle" vt="Int32">1342373901</property>
 										<property name="CtrlExStyle" vt="Int16">512</property>
@@ -666,8 +666,8 @@
 										<property name="Columns" vt="Collection">
 											<collection>
 												<item>
-													<property name="Caption" vt="String">R/W</property>
-													<property name="Width" vt="Int8">40</property>
+													<property name="Caption" vt="String">RW</property>
+													<property name="Width" vt="Int8">35</property>
 												</item>
 												<item>
 													<property name="Alignment" vt="Ident">taCenter</property>
@@ -677,12 +677,15 @@
 												<item>
 													<property name="Alignment" vt="Ident">taCenter</property>
 													<property name="Caption" vt="String">Archivo Imagen</property>
-													<property name="Width" vt="Int8">100</property>
+													<property name="Width" vt="Int16">190</property>
 												</item>
 												<item>
 													<property name="Alignment" vt="Ident">taCenter</property>
 													<property name="Caption" vt="String">Imagen</property>
-													<property name="Width" vt="Int8">100</property>
+												</item>
+												<item>
+													<property name="Caption" vt="String">ST</property>
+													<property name="Width" vt="Int8">40</property>
 												</item>
 											</collection>
 										</property>

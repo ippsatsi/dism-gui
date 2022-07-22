@@ -24,6 +24,8 @@ Func SelectFileDialog($tipo, $inControl,$mensaje,$filtro)
 
 
 ;~ 	$RutaArchivo =  FileOpenDialog($mensaje, @WindowsDir & "\", $filtro, BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
-	GUICtrlSetData($inControl, $RutaArchivo)
+	If $RutaArchivo <> "" Then
+		GUICtrlSetData($inControl, $RutaArchivo)
+	EndIf
 	Return $RutaArchivo
 EndFunc

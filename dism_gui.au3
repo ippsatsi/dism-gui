@@ -10,17 +10,21 @@
 #include <StaticConstants.au3>
 #include <TabConstants.au3>
 #include <WindowsConstants.au3>
+#include <Array.au3>
 
-
-
-#include <dism2_funciones.au3>
-#include <funciones_gui.au3>
 #include <gui_dism.au3>
 #include <gui_select_image.au3>
+#include <funciones_gui.au3>
+
+#include <dism2_funciones.au3>
+#include <funciones.au3>
 
 GUICtrlSetState($Capturar, @SW_SHOW)
 GUISetState(@SW_HIDE,$FormSelectImage)
 GUISetState(@SW_SHOW,$gui_dism)
+
+;~ variable para indicar la pestaña de la cual se activo el boton select imagen
+Global $indexCtrlSelectImage
 
 While 1
 	$nMsg = GUIGetMsg(1)
@@ -35,9 +39,6 @@ While 1
 		Case $FormSelectImage
 			Eventos_sel_image($nMsg[0])
 	EndSwitch
-
-
-
 WEnd
 
 Func Eventos_gui($ev)
@@ -51,6 +52,8 @@ Func Eventos_gui($ev)
 			$RutaFile = SelectFileDialog("folder", $inCapUnidadSrc, "Seleccione la unidad a capturar", "all")
 		Case $btnAplFileSrc
 			$RutaFile = SelectFileDialog("file", $inAplFileSrc, "Seleccione el archivo WIM", "wim")
+			$indexCtrlSelectImage = 0
+			ActualizarListaImagenes($indexCtrlSelectImage)
 		Case $btnAplExaminarDst
 			$RutaFile = SelectFileDialog("folder", $inAplUnidadDst, "Seleccione la unidad a capturar", "all")
 		Case $btnAplExaminarDst
@@ -59,29 +62,86 @@ Func Eventos_gui($ev)
 			$RutaFile = SelectFileDialog("folder", $inMntMontajeEn, "Seleccione la carpeta de montaje", "all")
 		Case $btnMntFileSrc
 			$RutaFile = SelectFileDialog("file", $inMntFileSrc, "Seleccione el archivo WIM", "wim")
+			$indexCtrlSelectImage = 1
+			ActualizarListaImagenes($indexCtrlSelectImage)
 		Case $btnExpExamSrc
 			$RutaFile = SelectFileDialog("file", $InExpFileSrc, "Seleccione el archivo WIM", "wim")
+			$indexCtrlSelectImage = 2
+			ActualizarListaImagenes($indexCtrlSelectImage)
 		Case $btnExpDst
 			$RutaFile = SelectFileDialog("file", $inExpFileDst, "Seleccione el archivo WIM", "wim")
 
 		Case $btnCapCrearImagen
-			If $inCapUnidadSrc <> "" And _
-				$inCapFileDst <> "" And _
-				$inCapImageName <> "" And _
-				$inCapImageDescr <> "" Then
-				DismApply(GUICtrlRead($inCapUnidadSrc), _
+			If GUICtrlRead($inCapUnidadSrc) <> "" And _
+				GUICtrlRead($inCapFileDst) <> "" And _
+				GUICtrlRead($inCapImageName) <> "" And _
+				GUICtrlRead($inCapImageDescr) <> "" Then
+				DismCapture(GUICtrlRead($inCapUnidadSrc), _
 					GUICtrlRead($inCapFileDst), _
 					GUICtrlRead($inCapImageName), _
 					GUICtrlRead($inCapImageDescr), _
-					GUICtrlRead($cmbCapComprx), $editForm)
+					GUICtrlRead($cmbCapComprx), $editForm, False)
+			EndIf
+		Case $btnCapAddImagen
+			If GUICtrlRead($inCapUnidadSrc) <> "" And _
+				GUICtrlRead($inCapFileDst) <> "" And _
+				GUICtrlRead($inCapImageName) <> "" And _
+				GUICtrlRead($inCapImageDescr) <> "" Then
+				DismCapture(GUICtrlRead($inCapUnidadSrc), _
+					GUICtrlRead($inCapFileDst), _
+					GUICtrlRead($inCapImageName), _
+					GUICtrlRead($inCapImageDescr), _
+					GUICtrlRead($cmbCapComprx), $editForm, True)
+			EndIf
+		Case $btnaplAplicarIma
+			If $inAplFileSrc <> "" And _
+				$inAplUnidadDst <> "" And _
+				$inAplIndexImage <> "" And _
+				$inAplIageName <> "" Then
+				DismApply(GUICtrlRead($inAplFileSrc), _
+					GUICtrlRead($inAplUnidadDst), _
+					GUICtrlRead($inAplIndexImage), _
+					$editForm)
+			EndIf
+		Case $BtnMntMount
+			If GUICtrlRead($inMntMontajeEn) <> "" And _
+				GUICtrlRead($inMntFileSrc) <> "" And _
+				GUICtrlRead($inMntIndexIma) <> "" Then
+				DismMount(GUICtrlRead($inMntMontajeEn), _
+					GUICtrlRead($inMntFileSrc), _
+					GUICtrlRead($inMntIndexIma), _
+					$editForm)
+			EndIf
+		Case $btnMntUnmount
+			Local $ItemSelected
+			If ControlListView($gui_dism, "", $lvMnt1, "GetItemCount") > 0 Then
+				$ItemSelected = ControlListView($gui_dism, "", $lvMnt1,"GetSelected", 1)
+				MsgBox($MB_SYSTEMMODAL,"Desmontar1", $ItemSelected & ' error:' & @error )
+				If $ItemSelected <> "" Then
+					Dim $arImagenMontada[5]
+					$arImagenMontada = StringSplit($ItemSelected,"|",  $STR_NOCOUNT )
+					_ArrayDisplay($arImagenMontada, "2D display")
+				Else
+					MsgBox($MB_SYSTEMMODAL,"Desmontar", "No ha seleccionado mninguna imagen montada")
+				EndIf
+
+
 			EndIf
 
+
+
 		Case $btnAplSelIma
-			GUISetState(@SW_SHOW,$FormSelectImage)
+			$indexCtrlSelectImage = 0
+			ActualizarListaImagenes($indexCtrlSelectImage)
+ShowFormListImagenes()
 		Case $btnMntSelIma
-			GUISetState(@SW_SHOW,$FormSelectImage)
+			$indexCtrlSelectImage = 1
+			ActualizarListaImagenes($indexCtrlSelectImage)
+			ShowFormListImagenes()
 		Case $btmExpSelIma
-			GUISetState(@SW_SHOW,$FormSelectImage)
+			$indexCtrlSelectImage = 2
+			ActualizarListaImagenes($indexCtrlSelectImage)
+			ShowFormListImagenes()
 	EndSwitch
 EndFunc
 
@@ -90,7 +150,7 @@ Func Eventos_sel_image($ev)
 		Case $GUI_EVENT_CLOSE
 			GUISetState(@SW_HIDE,$FormSelectImage)
 		Case $SelectImage
-;~ 			CargaImagenSelect()
+			CargaImagenSelect($indexCtrlSelectImage)
 			GUISetState(@SW_HIDE,$FormSelectImage)
 	EndSwitch
 EndFunc
