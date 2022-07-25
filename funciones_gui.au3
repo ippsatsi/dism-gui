@@ -20,7 +20,9 @@ Func SelectFileDialog($tipo, $inControl,$mensaje,$filtro)
 	If $tipo = "save" Then
 		$RutaArchivo = FileSaveDialog($mensaje, @WindowsDir & "\", $filtro,  $FD_PROMPTOVERWRITE)
 	ElseIf $tipo = "folder" Then
-		$RutaArchivo = FileSelectFolder($mensaje, @WindowsDir & "\")
+;~ 		$RutaArchivo = FileSelectFolder($mensaje, @WindowsDir & "\")
+;~ 		$RutaArchivo = FileSelectFolder($mensaje, "C:")
+		$RutaArchivo = FileSelectFolder("Choose your folder", "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}")
 	ElseIf $tipo = "driver" Then
 		$RutaArchivo = FileOpenDialog($mensaje, @WindowsDir & "\", $filtro, $FD_FILEMUSTEXIST)
 	Else

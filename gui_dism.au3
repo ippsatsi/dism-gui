@@ -1,5 +1,5 @@
 #Region ### START Koda GUI section ### Form=c:\users\w10\documents\git\dism gui\dism_gui_form.kxf
-$gui_dism = GUICreate("Dism GUI v1.0", 615, 578, 192, 124)
+$gui_dism = GUICreate("Dism GUI v" & _GetVersion() , 615, 578, 192, 124)
 $Tab1 = GUICtrlCreateTab(23, 8, 569, 377)
 
 $Capturar = GUICtrlCreateTabItem("Capturar")
@@ -90,6 +90,16 @@ GUICtrlSetData(-1, "")
 
 
 #EndRegion ### END Koda GUI section ###
+
+Func _GetVersion()
+    If @Compiled Then
+        Return FileGetVersion(@AutoItExe)
+Return "1.1.1.1"
+    Else
+        Return IniRead(@ScriptFullPath, "FileVersion", "#AutoIt3Wrapper_Res_Fileversion", "0.0.0.0")
+;~ Return "x.x.x.x"
+    EndIf
+EndFunc
 
 Global $arControlesSelectImagen[3][4]
 

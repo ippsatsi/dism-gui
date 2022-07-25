@@ -67,24 +67,9 @@ Func DismApply( $FilePathWim, $UnidadToApply, $ImageIndex, $Salida)
 ;~ 			/ApplyDir:<target_directory> {/Index:< image_index> | /Name:<image_name>}
 ;~ 			[/CheckIntegrity] [/Verify] [/NoRpFix] [/ConfirmTrustedFile] [/WIMBoot (deprecated)] [/Compact] [/EA]
 
-;~     Local Const $sFilePath = @TempDir & "\DirCreateFolder"
-
-;~     ; If the directory exists the don't continue.
-;~     If FileExists($sFilePath) Then
-;~         MsgBox($MB_SYSTEMMODAL, "", "An error occurred. The directory already exists.")
-;~         Return False
-;~     EndIf
-
-;~     ; Open the temporary directory.
-;~     ShellExecute(@TempDir)
-
-;~     ; Create the directory.
-;~     DirCreate($sFilePath)
-;~ 	Local $sScratchDir =
-
 	Local $txtCommandLine = 'dism /Apply-Image /ImageFile:"' & $FilePathWim & _
-								'" /ApplyDir:"' & $UnidadToApply & _
-								'" /Index:"' & $ImageIndex & '"'
+								'" /ApplyDir:' & $UnidadToApply & _
+								' /Index:"' & $ImageIndex & '"'
 ;~ 								'" /ScratchDir:" '
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	While ProcessExists($psTarea)
