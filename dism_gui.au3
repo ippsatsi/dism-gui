@@ -2,7 +2,7 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_x64=dism_gui.exe
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.3
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.4
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=p
 #AutoIt3Wrapper_Res_ProductName=dism_gui
 #AutoIt3Wrapper_Res_ProductVersion=1.0
@@ -44,8 +44,10 @@ While 1
 	EndIf
 
 	Switch $nMsg[1]
+;~ 		Eventos de la ventana principal
 		Case $gui_dism
 			Eventos_gui($nMsg[0])
+;~ 		Eventos de la venta de lista de imagenes
 		Case $FormSelectImage
 			Eventos_sel_image($nMsg[0])
 	EndSwitch
@@ -80,7 +82,7 @@ Func Eventos_gui($ev)
 			ActualizarListaImagenes($indexCtrlSelectImage)
 		Case $btnExpDst
 			$RutaFile = SelectFileDialog("file", $inExpFileDst, "Seleccione el archivo WIM", "wim")
-
+;~ 		Boton capturar/crear archivo
 		Case $btnCapCrearImagen
 			If GUICtrlRead($inCapUnidadSrc) <> "" And _
 				GUICtrlRead($inCapFileDst) <> "" And _
@@ -92,6 +94,7 @@ Func Eventos_gui($ev)
 					GUICtrlRead($inCapImageDescr), _
 					GUICtrlRead($cmbCapComprx), $editForm, False)
 			EndIf
+;~ 		Boton capturar/añadir imagen a archivo
 		Case $btnCapAddImagen
 			If GUICtrlRead($inCapUnidadSrc) <> "" And _
 				GUICtrlRead($inCapFileDst) <> "" And _
@@ -128,7 +131,6 @@ Func Eventos_gui($ev)
 			If ControlListView($gui_dism, "", $lvMnt1, "GetItemCount") > 0 Then
 				$intItemSelected = ControlListView($gui_dism, "", $lvMnt1,"GetSelected")
 				$strRutaMontajeSel = ControlListView($gui_dism, "", $lvMnt1,"GetText", $ItemSelected, 1)
-;~ 				MsgBox($MB_SYSTEMMODAL,"Desmontar1", $strItemSelected & ' error:' & @error )
 				If $strRutaMontajeSel <> "" Then
 					DismUnmount($strRutaMontajeSel, GUICtrlRead($ckbMntCommit), $editForm)
 					getListMounted($lvMnt1)
@@ -145,7 +147,6 @@ Func Eventos_gui($ev)
 			If ControlListView($gui_dism, "", $lvMnt1, "GetItemCount") > 0 Then
 				$intItemSelected = ControlListView($gui_dism, "", $lvMnt1,"GetSelected")
 				$strRutaMontajeSel = ControlListView($gui_dism, "", $lvMnt1,"GetText", $ItemSelected, 1)
-;~ 				MsgBox($MB_SYSTEMMODAL,"Desmontar1", $strItemSelected & ' error:' & @error )
 				If $strRutaMontajeSel <> "" Then
 					Local $RutaDriver = SelectFileDialog("driver", $inCapFileDst,"Seleccione el .inf del driver a instalar", "inf")
 					If $RutaDriver <> "" Then
@@ -175,7 +176,7 @@ Func Eventos_gui($ev)
 				GUICtrlRead($inExpFileDst) <> "" Then
 				DismExport(GUICtrlRead($InExpFileSrc), GUICtrlRead($inExpFileDst), GUICtrlRead($inExpImIndex), GUICtrlRead($cmbExpCompx), $editForm)
 			EndIf
-
+;~  	botones de seleccion de imagen
 		Case $btnAplSelIma
 			$indexCtrlSelectImage = 0
 			ActualizarListaImagenes($indexCtrlSelectImage)
@@ -190,7 +191,7 @@ Func Eventos_gui($ev)
 			ShowFormListImagenes()
 	EndSwitch
 EndFunc
-
+;~ eventos de la ventana de seleccion de imagenes
 Func Eventos_sel_image($ev)
 		Switch $ev
 		Case $GUI_EVENT_CLOSE

@@ -3,6 +3,7 @@ Global $arImagenes
 Global $arListMounted
 
 Func ExtraerValorParametro($ParamValor)
+;~ 	Extrae el valor de un parametro cuando estan separados por ":"
 	Local $arParametro
 	$arParametro = StringSplit(StringStripWS($ParamValor,7), ":",2)
 	;una vez extraido, le limpiamos los espacios
@@ -49,8 +50,8 @@ Func DismCapture($UnidadCap, $FilePath, $ImageName, $ImageDescrip,$compresion, $
 ;~ 					[/Description:<image_description>]
 ;~ [/ConfigFile:<configuration_file.ini>] {[/Compress:{max|fast|none}] [/Bootable] | [/WIMBoot]} [/CheckIntegrity] [/Verify] [/NoRpFix] [/EA]
 	Local $txtCommandLine = 'dism ' & ($bolAppend ? '/Append-Image' : '/Capture-Image') & ' /ImageFile:"' & $FilePath & _
-								'" /CaptureDir:"' & $UnidadCap & _
-								'" /Name:"' & $ImageName & _
+								'" /CaptureDir:' & $UnidadCap & _
+								' /Name:"' & $ImageName & _
 								'" /Description:"' & $ImageDescrip & _
 								($bolAppend ? '"' : '" /Compress:' & $compresion)
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
@@ -208,7 +209,6 @@ Func VerifyDrivers($RutaMontaje, $Salida)
 	WEnd
 EndFunc
 
-;~ DismExport(GUICtrlRead($InExpFileSrc), GUICtrlRead($inExpFileDst), GUICtrlRead($inExpImIndex), GUICtrlRead($cmbExpCompx), $editForm)
 Func DismExport($RutaFileSrc, $RutaFileDst,  $ImageIndex, $compresion, $Salida)
 ;~ 	Dism /Export-Image /SourceImageFile:<path_to_image_file>
 ;~ 	{/SourceIndex:<image_index> | /SourceName:<image_name>}

@@ -1,10 +1,3 @@
-;~ 					Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
-;~ 					If $sWimPathFile <> "" Then
-;~ 						GUICtrlSetData($inFileImagePath, $sWimPathFile)
-;~ 						CargaListaImagenes($sWimPathFile)
-;~ 					EndIf
-
-
 Func SelectFileDialog($tipo, $inControl,$mensaje,$filtro)
 	$wim_filtro = "archivos wim (*.wim)"
 	$all_files = "Todos (*.*)"
