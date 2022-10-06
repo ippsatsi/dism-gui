@@ -3,7 +3,6 @@
 #AutoIt3Wrapper_Outfile_x64=dism_gui.exe
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_Fileversion=1.0.0.4
-#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=p
 #AutoIt3Wrapper_Res_ProductName=dism_gui
 #AutoIt3Wrapper_Res_ProductVersion=1.0
 #AutoIt3Wrapper_Res_HiDpi=Y
