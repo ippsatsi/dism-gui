@@ -102,7 +102,7 @@ Return "1.1.1.1"
 EndFunc
 
 Global $arControlesSelectImagen[3][4]
-
+Global $gi_AlmacenTextoMensajes = ""
 ;~ aplicar
 $arControlesSelectImagen[0][0] = $btnAplSelIma
 $arControlesSelectImagen[0][1] = $inAplFileSrc

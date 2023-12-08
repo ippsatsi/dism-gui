@@ -49,16 +49,49 @@ Func DismCapture($UnidadCap, $FilePath, $ImageName, $ImageDescrip,$compresion, $
 ;~ 					/Name:<image_name>
 ;~ 					[/Description:<image_description>]
 ;~ [/ConfigFile:<configuration_file.ini>] {[/Compress:{max|fast|none}] [/Bootable] | [/WIMBoot]} [/CheckIntegrity] [/Verify] [/NoRpFix] [/EA]
+	Local $strProgresoTexto = ""
+	Local $value = 0
+	Local $percent = 0
 	Local $txtCommandLine = 'dism ' & ($bolAppend ? '/Append-Image' : '/Capture-Image') & ' /ImageFile:"' & $FilePath & _
 								'" /CaptureDir:' & $UnidadCap & _
 								' /Name:"' & $ImageName & _
 								'" /Description:"' & $ImageDescrip & _
 								($bolAppend ? '"' : '" /Compress:' & $compresion)
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	MensajesProgreso($Salida, $txtCommandLine)
 	While ProcessExists($psTarea)
 		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
-		GUICtrlSetData($Salida, $mensajes)
+		;GUICtrlSetData($Salida, $mensajes)
+
+		$line = StdoutRead($psTarea, True)
+		If StringInStr($line, ".0%") Then
+			;separamos a partir del .0%, para hallar el % de progreso
+			$line1 = StringSplit($line, ".0%",$STR_ENTIRESPLIT)
+			$value = StringRight($line1[$line1[0] - 1], 2) ; agarramos el ultimo % leido
+		EndIf
+		; Si llega a 00 es porque llego al 100% y finalizo correctamente
+		If $value == "00" Then $value = 100
+
+
+		Sleep(100)
+		If $percent <> $value Then
+
+			$strProgresoTexto = f_ProgresoTexto($value, 3)
+			f_MensajesProgreso_MostrarProgresoTexto($Salida, $strProgresoTexto)
+
+			$percent = $value
+		EndIf
+
+		;If $value = 100 Then ExitLoop
 	WEnd
+	Local $sSalida = StdoutRead($psTarea, True)
+	$sSalida = ReemplazarCaracteresEspanol($sSalida)
+	;_ArrayDisplay($arSalida)
+	MensajesProgreso($Salida,$strProgresoTexto)
+	MensajesProgreso($Salida, " ")
+;==========================
+
+
 EndFunc
 
 Func DismApply( $FilePathWim, $UnidadToApply, $ImageIndex, $Salida)
