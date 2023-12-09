@@ -15,9 +15,9 @@ Func ReemplazarCaracteresEspanol($sSalida)
 	$sSalida = StringReplace($sSalida, "S¡", "Si")
 	$sSalida = StringReplace($sSalida, "¡", "í")
 	$sSalida = StringReplace($sSalida, "£", "ú")
-	$sSalida = StringReplace($sSalida, "¢", "ó")
+	$sSalida = StringReplace($sSalida, "¢", "ó");
 	$sSalida = StringReplace($sSalida, "¤", "ñ")
-	$sSalida = StringReplace($sSalida, "Ö", "Í")
+	$sSalida = StringReplace($sSalida, "Ö", "Í");
 	Return $sSalida
 EndFunc
 
@@ -49,9 +49,8 @@ Func DismCapture($UnidadCap, $FilePath, $ImageName, $ImageDescrip,$compresion, $
 ;~ 					/Name:<image_name>
 ;~ 					[/Description:<image_description>]
 ;~ [/ConfigFile:<configuration_file.ini>] {[/Compress:{max|fast|none}] [/Bootable] | [/WIMBoot]} [/CheckIntegrity] [/Verify] [/NoRpFix] [/EA]
-	Local $strProgresoTexto = ""
-	Local $value = 0
-	Local $percent = 0
+
+
 	Local $txtCommandLine = 'dism ' & ($bolAppend ? '/Append-Image' : '/Capture-Image') & ' /ImageFile:"' & $FilePath & _
 								'" /CaptureDir:' & $UnidadCap & _
 								' /Name:"' & $ImageName & _
@@ -59,38 +58,7 @@ Func DismCapture($UnidadCap, $FilePath, $ImageName, $ImageDescrip,$compresion, $
 								($bolAppend ? '"' : '" /Compress:' & $compresion)
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	MensajesProgreso($Salida, $txtCommandLine)
-	While ProcessExists($psTarea)
-		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
-		;GUICtrlSetData($Salida, $mensajes)
-
-		$line = StdoutRead($psTarea, True)
-		If StringInStr($line, ".0%") Then
-			;separamos a partir del .0%, para hallar el % de progreso
-			$line1 = StringSplit($line, ".0%",$STR_ENTIRESPLIT)
-			$value = StringRight($line1[$line1[0] - 1], 2) ; agarramos el ultimo % leido
-		EndIf
-		; Si llega a 00 es porque llego al 100% y finalizo correctamente
-		If $value == "00" Then $value = 100
-
-
-		Sleep(100)
-		If $percent <> $value Then
-
-			$strProgresoTexto = f_ProgresoTexto($value, 3)
-			f_MensajesProgreso_MostrarProgresoTexto($Salida, $strProgresoTexto)
-
-			$percent = $value
-		EndIf
-
-		;If $value = 100 Then ExitLoop
-	WEnd
-	Local $sSalida = StdoutRead($psTarea, True)
-	$sSalida = ReemplazarCaracteresEspanol($sSalida)
-	;_ArrayDisplay($arSalida)
-	MensajesProgreso($Salida,$strProgresoTexto)
-	MensajesProgreso($Salida, " ")
-;==========================
-
+	f_MostrarProgresoTexto($Salida, $psTarea)
 
 EndFunc
 
@@ -106,10 +74,12 @@ Func DismApply( $FilePathWim, $UnidadToApply, $ImageIndex, $Salida)
 								' /Index:"' & $ImageIndex & '"'
 ;~ 								'" /ScratchDir:" '
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
-	While ProcessExists($psTarea)
-		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
-		GUICtrlSetData($Salida, $mensajes)
-	WEnd
+	MensajesProgreso($Salida, $txtCommandLine)
+	f_MostrarProgresoTexto($Salida, $psTarea)
+;~ 	While ProcessExists($psTarea)
+;~ 		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+;~ 		GUICtrlSetData($Salida, $mensajes)
+;~ 	WEnd
 EndFunc
 
 Func DismMount( $RutaMontaje, $FileIma, $ImageIndex, $Salida)
@@ -122,10 +92,12 @@ Func DismMount( $RutaMontaje, $FileIma, $ImageIndex, $Salida)
 								'" /Index:"' & $ImageIndex & '"'
 
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
-	While ProcessExists($psTarea)
-		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
-		GUICtrlSetData($Salida, $mensajes)
-	WEnd
+	MensajesProgreso($Salida, $txtCommandLine)
+	f_MostrarProgresoTexto($Salida, $psTarea)
+;~ 	While ProcessExists($psTarea)
+;~ 		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+;~ 		GUICtrlSetData($Salida, $mensajes)
+;~ 	WEnd
 	getListMounted($lvMnt1)
 EndFunc
 
@@ -150,12 +122,15 @@ Func getListMounted($ctrlListView)
 
 	ProcessWaitClose($psTarea)
 	Local $sSalida = StdoutRead($psTarea)
+;~ 	ConsoleWrite("++" & $sSalida & @CRLF)
 	$sSalida = ReemplazarCaracteresEspanol($sSalida)
+
 	;para q reconozca en ingles y español
-	StringReplace($sSalida, "Index :", "Imagen:")
+	StringReplace($sSalida, "Index", "Imagen")
 	Local $intNumIndex = @extended
-	StringReplace($sSalida, "Índice:", "Imagen:")
+	StringReplace($sSalida, "Índice", "Imagen")
 	$intNumIndex = @extended + $intNumIndex
+;~ 	ConsoleWrite("**" & $sSalida & @CRLF)
 	If DismSuccessDosIdiomas($sSalida) And $intNumIndex > 0 Then
 		Dim $arListMounted[$intNumIndex][5]
 		$sSalida = StringReplace($sSalida,@CRLF & @CRLF , "|")
@@ -199,10 +174,12 @@ Func DismUnmount($RutaMontaje, $bolGuardarCambios, $Salida)
 								'" ' & $strSave
 
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
-	While ProcessExists($psTarea)
-		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
-		GUICtrlSetData($Salida, $mensajes)
-	WEnd
+	MensajesProgreso($Salida, $txtCommandLine)
+	f_MostrarProgresoTexto($Salida, $psTarea)
+;~ 	While ProcessExists($psTarea)
+;~ 		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+;~ 		GUICtrlSetData($Salida, $mensajes)
+;~ 	WEnd
 
 EndFunc
 
@@ -213,10 +190,12 @@ Func OptimizeImage($RutaMontaje, $Salida)
 								'" /Cleanup-Image /StartComponentCleanup '
 
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
-	While ProcessExists($psTarea)
-		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
-		GUICtrlSetData($Salida, $mensajes)
-	WEnd
+	MensajesProgreso($Salida, $txtCommandLine)
+	f_MostrarProgresoTexto($Salida, $psTarea)
+;~ 	While ProcessExists($psTarea)
+;~ 		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+;~ 		GUICtrlSetData($Salida, $mensajes)
+;~ 	WEnd
 EndFunc
 
 Func DismAddDriver($RutaDriver, $strRutaMontajeSel, $Salida)
@@ -253,10 +232,12 @@ Func DismExport($RutaFileSrc, $RutaFileDst,  $ImageIndex, $compresion, $Salida)
 							' /DestinationImageFile:"' & $RutaFileDst & _
 							'" /Compress:' & $compresion
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
-	While ProcessExists($psTarea)
-		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
-		GUICtrlSetData($Salida, $mensajes)
-	WEnd
+	MensajesProgreso($Salida, $txtCommandLine)
+	f_MostrarProgresoTexto($Salida, $psTarea)
+;~ 	While ProcessExists($psTarea)
+;~ 		Local $mensajes = $txtCommandLine & @CRLF & StdoutRead($psTarea, True)
+;~ 		GUICtrlSetData($Salida, $mensajes)
+;~ 	WEnd
 EndFunc
 
 
@@ -266,11 +247,12 @@ Func CargaListaImagenes($sRutaFileWim)
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	ProcessWaitClose($psTarea)
 	Local $sSalida = StdoutRead($psTarea)
+
 	$sSalida = ReemplazarCaracteresEspanol($sSalida)
 	;para q reconozca en ingles y español
-	StringReplace($sSalida, "Index :", "Imagen:")
+	StringReplace($sSalida, "Index", "Imagen")
 	Local $intNumIndex = @extended
-	StringReplace($sSalida, "Índice:", "Imagen:")
+	StringReplace($sSalida, "Índice", "Imagen")
 	$intNumIndex = @extended + $intNumIndex
 ;~ 	MsgBox($MB_SYSTEMMODAL,"pruba", $sSalida)
 	If DismSuccessDosIdiomas($sSalida) And $intNumIndex > 0 Then
